@@ -2,6 +2,7 @@ import Image from "next/image";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Header from "@/components/shared/Header";
+import CareerAIComponent from "@/components/shared/CareerAIComponent";
 
 export default async function Home() {
   const { userId } = await auth();
@@ -14,8 +15,8 @@ export default async function Home() {
     <div className="flex flex-col justify-center ">
       <Header />
       <hr />
-      <main>
-        hhhhhhhhhhhh
+      <main className="px-10 py-5">
+        <CareerAIComponent />
       </main>
     </div>
   );
