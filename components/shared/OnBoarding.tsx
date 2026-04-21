@@ -150,7 +150,7 @@ export default function OnBoarding({ onSubmit }: OnBoardingProps) {
   }
 
   return (
-    <Card className="w-full max-w-3xl mx-auto rounded-xl shadow-lg border border-border/60">
+    <Card className="w-full max-w-3xl mx-auto rounded-xl shadow-lg border border-border/60 flex flex-col h-full">
       {/* ── Header ── */}
       <CardHeader>
         <div className="flex items-center gap-2.5">
@@ -180,7 +180,7 @@ export default function OnBoarding({ onSubmit }: OnBoardingProps) {
       </CardHeader>
 
       {/* ── Form fields ── */}
-      <CardContent>
+      <CardContent className="flex-1">
         <form id="onboarding-form" className="grid grid-cols-1 sm:grid-cols-2 gap-5" onSubmit={handleSubmit} noValidate>
           {FORM_FIELDS.map((field) => {
             const Icon = field.icon;
@@ -233,7 +233,7 @@ export default function OnBoarding({ onSubmit }: OnBoardingProps) {
         <p className="flex items-start gap-1.5 text-xs text-muted-foreground leading-relaxed">
           <Lightbulb weight="fill" className="size-3.5 mt-0.5 shrink-0" />
           We&apos;ll use this to sketch a realistic, focused path. Adjust
-          anytime with Jake.
+          anytime with Zak.
         </p>
 
         <Button
