@@ -1,43 +1,39 @@
-import { ChatMessage, MonthPlan, Task } from "@/lib/types";
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GOOGLE_API_KEY,
-});
+export const dynamic = "force-dynamic";
 
-const CHAT_MODEL = ["gemini-3-flash-preview", "gemini-2.5-flash"] as const;
+const CHAT_MODELS = ["gemini-3-flash-preview", "gemini-2.5-flash"] as const;
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
+  const ai = new GoogleGenAI({});
   try {
-    const { profile, messages, selectedMonthId, plan } = await req.json();
+    const { profile, plan, selectedMonthId, messages } = await request.json();
 
-    // find selected month
-    const selectedMonth = plan?.months.find(
-      (m: MonthPlan) => m.id === selectedMonthId,
-    );
+    // Find the selected month
+    const selectedMonth = plan?.months?.find((m: any) => m.id === selectedMonthId);
 
-    const calculateProgress = (tasks: Task[]) => {
+    // Calculate progress
+    const calculateProgress = (tasks: any[]) => {
       if (!tasks || tasks.length === 0) return 0;
-
-      const completedTasks = tasks.filter((t) => t.status === "done").length;
-
-      return Math.round((completedTasks / tasks.length) * 100);
+      const completed = tasks.filter((t) => t.status === "complete").length;
+      return Math.round((completed / tasks.length) * 100);
     };
 
     const monthProgress = selectedMonth
       ? calculateProgress(selectedMonth.tasks)
       : 0;
 
-    const overallProgress = plan.months
+    const overallProgress = plan?.months
       ? Math.round(
           plan.months.reduce(
-            (sum: number, m: MonthPlan) => sum + calculateProgress(m.tasks),
-            0,
-          ) / plan.months.length,
+            (sum: number, m: any) => sum + calculateProgress(m.tasks),
+            0
+          ) / plan.months.length
         )
       : 0;
 
+    // Build context for Zak
     const systemPrompt = `You are Zak, a supportive AI career assistant helping ${
       profile?.name || "someone"
     } transition from ${profile?.currentRole || "their current role"} to ${
@@ -70,32 +66,28 @@ Your role:
 
 Recent conversation history is provided below.`;
 
-    const conversationHistory = messages.slice(-6)
-      .map(
-        (msg: ChatMessage) =>
-          `${msg.from === "user" ? "User" : "Zak"}: ${msg.content}`,
-      )
+    // Format conversation history
+    const conversationHistory = messages
+      .slice(-6) // Last 6 messages for context
+      .map((m: any) => `${m.from === "user" ? "User" : "Zak"}: ${m.content}`)
       .join("\n");
 
-    const fullPrompt = `
-    ${systemPrompt}
-    
-    Previous conversation:
-    ${conversationHistory}
+    const fullPrompt = `${systemPrompt}
 
-    Respond as Zak, keeping your answer helpful, specific, and encouraging`;
-    
+Recent conversation:
+${conversationHistory}
+
+Respond as Zak, keeping your answer helpful, specific, and encouraging.`;
+
     let reply = "";
     let lastError: unknown = null;
-
-    for (const model of CHAT_MODEL) {
+    for (const model of CHAT_MODELS) {
       try {
-        const res = await ai.models.generateContent({
+        const response = await ai.models.generateContent({
           model,
           contents: fullPrompt,
         });
-
-        reply = (res.text ?? "").trim();
+        reply = (response.text ?? "").trim();
         if (reply) break;
       } catch (error) {
         lastError = error;
@@ -103,15 +95,15 @@ Recent conversation history is provided below.`;
     }
 
     if (!reply) {
-      throw lastError ?? new Error("No response from Gemini");
+      throw lastError ?? new Error("No response from Gemini chat generation.");
     }
 
     return NextResponse.json({ reply });
-  } catch (error) {
-    console.error("Error in chat route: ", error);
+  } catch (error: any) {
+    console.error("Error generating chat response:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 },
+      { error: error.message || "Failed to generate response" },
+      { status: 500 }
     );
   }
 }
