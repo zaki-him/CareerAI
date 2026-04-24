@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
     const calculateProgress = (tasks: any[]) => {
       if (!tasks || tasks.length === 0) return 0;
-      const completed = tasks.filter((t) => t.status === "complete").length;
+      const completed = tasks.filter((t) => t.status === "done").length;
       return Math.round((completed / tasks.length) * 100);
     };
 

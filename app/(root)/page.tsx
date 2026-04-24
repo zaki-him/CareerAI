@@ -32,10 +32,12 @@ export default function Home() {
   const [isHydrated, setIsHydrated] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [input, setInput] = useState("");
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
 
   useEffect(() => {
     setIsHydrated(true);
   }, []);
+
 
   const handleSendMessage = async () => {
     const trimmed = input.trim();
