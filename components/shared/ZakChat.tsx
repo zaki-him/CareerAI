@@ -70,7 +70,7 @@ export default function ZakChat({
   }, [messages]);
 
   return (
-    <section className="flex h-full w-full min-h-[320px] flex-col overflow-hidden rounded-xl border border-border bg-card p-4 text-xs shadow-sm sm:p-5">
+    <section className="flex h-[540px] w-full flex-col overflow-hidden rounded-xl border border-border bg-card p-4 text-xs shadow-sm sm:p-5">
       <div className="mb-3 flex items-start gap-2.5">
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
           J
@@ -87,7 +87,7 @@ export default function ZakChat({
       </div>
 
       <div className="mt-2 flex-1 overflow-hidden rounded-lg border border-border bg-background/60 p-2">
-        <div ref={scrollContainerRef} className="flex h-full flex-col gap-2.5 overflow-y-auto pr-1">
+        <div ref={scrollContainerRef} className="h-full flex flex-col gap-2.5 overflow-y-auto pr-1">
           {messages.map((msg) => (
             <div
               key={msg.id}
@@ -114,7 +114,7 @@ export default function ZakChat({
                         : "bg-primary/10 text-primary"
                     )}
                   >
-                    {msg.from === "user" ? "Y" : "J"}
+                    {msg.from === "user" ? "Y" : "Z"}
                   </div>
                   <p
                     className={cn(
