@@ -34,78 +34,7 @@ function createInitialState(): AppState {
   };
 }
 
-function generateMockPlan(profile: UserProfile): Plan {
-  const baseThemes = [
-    "Foundations & Clarity",
-    "Skill Mapping & Gap Analysis",
-    "Core Skills – Fundamentals",
-    "Core Skills – Projects",
-    "Portfolio & Storytelling",
-    "Networking & Visibility",
-    "Interview Readiness",
-    "Deep Dives & Specialization",
-    "Leadership & Ownership",
-    "Industry Positioning",
-    "Refinement & Stretch Goals",
-    "Launch / Transition",
-  ];
 
-  const months: MonthPlan[] = Array.from({ length: 12 }, (_, i) => {
-    const index = i + 1;
-    const theme = baseThemes[i] ?? `Month ${index} Focus`;
-
-    const tasks: Task[] = [
-      {
-        id: `m${index}-t1`,
-        title: "Learn & absorb",
-        description:
-          i === 0
-            ? `Clarify your target move into ${profile.desiredRole || "your next role"} and capture 3–5 concrete outcomes you want in 12 months.`
-            : "Complete a focused learning block and summarize your key takeaways in 5–10 bullet points.",
-        category: "learning",
-        status: "todo",
-      },
-      {
-        id: `m${index}-t2`,
-        title: "Build & practice",
-        description:
-          "Apply what you learned in a small, scoped project or task that you can talk about in future interviews.",
-        category: "practice" as any,
-        status: "todo",
-      },
-      {
-        id: `m${index}-t3`,
-        title: "Connect with others",
-        description:
-          "Have at least one meaningful conversation with someone working in or near your target role.",
-        category: "networking" as any,
-        status: "todo",
-      },
-      {
-        id: `m${index}-t4`,
-        title: "Reflect & adjust",
-        description:
-          "Write a short reflection: what moved you closer to your goal this month, and what will you adjust next month?",
-        category: "reflection" as any,
-        status: "todo",
-      },
-    ];
-
-    return {
-      id: `month-${index}`,
-      index,
-      title: `Month ${index}`,
-      theme,
-      summary: `Focus on ${theme.toLowerCase()} as you move toward ${profile.desiredRole || "your next step"}.`,
-      tasks,
-    };
-  });
-
-  return {
-    id: `plan-${Date.now()}`,
-    months,
-  };
-}
 
 export default function Home() {
   const { isLoaded, userId } = useAuth();
@@ -208,9 +137,8 @@ export default function Home() {
           throw new Error("Plan not found in response");
         }
       } else {
-        const errorText = await res.text();
-        console.error("Plan generation API failed:", errorText);
-        plan = generateMockPlan(profile);
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Plan generation API failed");
       }
 
       setState((prev) => ({
@@ -229,16 +157,9 @@ export default function Home() {
           },
         ],
       }));
-    } catch (error) {
-      console.error("Error calling /api/plan, using mock plan instead:", error);
-      const plan = generateMockPlan(profile);
-      setState((prev) => ({
-        ...prev,
-        stage: "plan",
-        profile,
-        plan,
-        selectedMonthId: plan.months[0]?.id ?? null,
-      }));
+    } catch (error: any) {
+      console.error("Error calling /api/plan:", error);
+      alert(error.message || "I couldn't generate your plan right now. Zak might be a bit busy — please try again in a moment.");
     } finally {
       setIsGeneratingPlan(false);
     }
