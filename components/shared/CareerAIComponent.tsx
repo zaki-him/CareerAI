@@ -2,7 +2,7 @@ import React from 'react'
 
 const CareerAIComponent = () => {
   return (
-    <div className='shadow-2xl rounded-xl border py-3 px-5 flex'>
+    <div className='shadow-2xl rounded-4xl border py-2 px-5 flex w-full'>
       <div className='bg-black p-1.5 rounded-md'>
         <h1 className='text-white'>cAI</h1>
       </div>
